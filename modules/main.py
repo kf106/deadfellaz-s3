@@ -369,6 +369,7 @@ def left_scr(text, fg, bg, height):
 try:
     while True:
         r = random.randint(1,10000)
+        f = random.randint(1,10)
 
         metadata = urequests.get(
             url="https://blockchaingandalf.com/fellaz/" +
@@ -381,7 +382,13 @@ try:
             url="https://blockchaingandalf.com/fellaz/z" +
             str(r) + 
             ".png"
-        ).content        
+        ).content   
+
+        front = urequests.get(
+            url="https://blockchaingandalf.com/fellaz/f" +
+            str(r) + 
+            ".png"
+        ).content         
 
         tft.fill(s3lcd.BLACK)
         tft.rect(0,0,170,170,0x1f06)
@@ -407,14 +414,27 @@ try:
         left_scr(str(obj["attributes"][12]["value"]), 0x4c6c, s3lcd.BLACK, 152)
 
         tft.png(image, 2, 2)
-
         tft.show()
-        time.sleep(4)
+        time.sleep(3)
+
+        if (f > 5): 
+            tft.png(front, 2, 2)
+            tft.show()
+
+        time.sleep(1)
+        tft.png(image, 2, 2)
+        tft.show()
+        time.sleep(2)
+
 
 except Exception as ex:
-    error = type(ex)
-    center_scr("Error", s3lcd.RED, s3lcd.BLACK, 144)
-    center_scr(str(error), s3lcd.WHITE, s3lcd.BLACK, 154)
+    error = str(type(ex))
+    # while (len(error) % 38 != 0):
+    #    error = error + " "
+    print_scr("Error on count" + str(r), s3lcd.BLACK, s3lcd.RED)
+    #for i in range(0, len(error) // 38):
+    #    print_scr(error[(i * 38):(i * 38) + 37], s3lcd.WHITE, s3lcd.RED)
+    print_scr(error, s3lcd.WHITE, s3lcd.RED)
     tft.show()
     time.sleep(60)  
 
