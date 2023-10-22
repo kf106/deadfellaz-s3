@@ -1,5 +1,6 @@
 import vga1_8x8 as small
 import tft_config
+import tft_buttons
 import s3lcd
 
 import network
@@ -13,6 +14,8 @@ import random
 
 tft = tft_config.config(tft_config.WIDE)
 tft.init()
+
+buttons = tft_buttons.Buttons()
 messages = []
 
 #############################################################################
@@ -366,10 +369,25 @@ def left_scr(text, fg, bg, height):
         bg
     )
 
+
+b = 0
+
+def button_sleep(pause, image, front):
+    for i in range(0,pause * 20):
+        global b
+        if (buttons.right and buttons.right.value() == 0) and b == 0:
+            b = 1
+            tft.png(front, 2, 2)
+            tft.show()
+        elif (buttons.right and buttons.right.value() == 1) and b == 1:
+            b = 0
+            tft.png(image, 2, 2)
+            tft.show()
+        time.sleep(0.05)
+
 try:
     while True:
         r = random.randint(1,10000)
-        f = random.randint(1,10)
 
         metadata = urequests.get(
             url="https://blockchaingandalf.com/fellaz/" +
@@ -393,6 +411,7 @@ try:
         tft.fill(s3lcd.BLACK)
         tft.rect(0,0,170,170,0x1f06)
         tft.rect(1,1,168,168,0x4349)
+
         center_scr(obj["name"], 0x07e4, s3lcd.BLACK, 4)
 
         left_scr(obj["attributes"][1]["trait_type"] + ":", 0x76cf, s3lcd.BLACK, 22)
@@ -415,26 +434,17 @@ try:
 
         tft.png(image, 2, 2)
         tft.show()
-        time.sleep(3)
-
-        if (f > 5): 
-            tft.png(front, 2, 2)
-            tft.show()
-
-        time.sleep(1)
-        tft.png(image, 2, 2)
-        tft.show()
-        time.sleep(2)
-
+        button_sleep(6, image, front)
 
 except Exception as ex:
     error = str(type(ex))
     # while (len(error) % 38 != 0):
     #    error = error + " "
-    print_scr("Error on count" + str(r), s3lcd.BLACK, s3lcd.RED)
+    print_scr("Error on count " + str(r), s3lcd.BLACK, s3lcd.RED)
+    print_scr(error, s3lcd.WHITE, s3lcd.RED)
+    print_scr(str(ex.errno))
     #for i in range(0, len(error) // 38):
     #    print_scr(error[(i * 38):(i * 38) + 37], s3lcd.WHITE, s3lcd.RED)
-    print_scr(error, s3lcd.WHITE, s3lcd.RED)
     tft.show()
     time.sleep(60)  
 
